@@ -7,9 +7,9 @@
     
     <meta name="robots" content="index, follow">
     <title>Chiara Oliver - NO FUE REAL TOUR | Entradas Ya a la Venta</title>
-    <meta name="description" content="¡Entradas ya disponibles! Compra tus tickets oficiales para el NO FUE REAL TOUR de Chiara Oliver en Madrid, Barcelona y más ciudades.">
+    <meta name="description" content="¡Entradas ya disponibles! Compra tus tickets oficiales para el NO FUE REAL TOUR de Chiara Oliver en Madrid y Barcelona. Consulta precios y fechas.">
     <meta property="og:title" content="Chiara Oliver - NO FUE REAL TOUR | ¡Entradas Disponibles!">
-    <meta property="og:description" content="No te quedes sin tu entrada. Madrid y Barcelona ya a la venta. Consulta todas las fechas aquí.">
+    <meta property="og:description" content="No te quedes sin tu entrada para Madrid y Barcelona. Consulta todos los precios y tipos de tickets aquí.">
     <meta property="og:image" content="https://chiaraoliveroficial.com/cdn/shop/files/portada-nofuereal.png?v=1775662831&width=1000">
     <meta name="twitter:card" content="summary_large_image">
 
@@ -122,7 +122,7 @@
             display: flex;
             align-items: center;
             gap: 35px;
-            flex: 1.2;
+            flex: 1.5;
         }
 
         .tour-date {
@@ -167,6 +167,27 @@
             opacity: 0.95;
         }
 
+        .ticket-prices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .price-badge {
+            font-size: 0.65rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .price-badge strong {
+            color: var(--azul);
+        }
+
         .venue-links {
             display: flex;
             gap: 15px;
@@ -189,7 +210,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            flex: 1;
+            flex: 0.8;
             justify-content: flex-end;
         }
 
@@ -222,9 +243,43 @@
             box-shadow: none;
         }
 
-        .tour-item.soon {
-            opacity: 0.7;
-            border-style: dashed;
+        .minor-policy {
+            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .minor-policy h4 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--rosa);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .minor-policy p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto 15px;
+        }
+
+        .form-link {
+            color: var(--amarillo);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-link:hover {
+            border-bottom: 1px solid var(--amarillo);
         }
 
         .footer-socials {
@@ -248,20 +303,17 @@
 
         .scroll-down-btn { display: flex !important; }
 
+        @media (max-width: 992px) {
+            .tour-item { flex-direction: column; padding: 30px; text-align: center; }
+            .tour-info { flex-direction: column; gap: 15px; }
+            .tour-actions { width: 100%; justify-content: center; }
+            .ticket-prices { justify-content: center; }
+        }
+
         @media (max-width: 768px) {
             .social-header { padding: 15px 20px; }
-            .tour-header { margin-bottom: 20px; }
-            .more-dates-banner { width: 100%; padding: 15px; margin-bottom: 30px; }
-            .tour-item {
-                flex-direction: column;
-                padding: 35px 20px;
-                text-align: center;
-            }
-            .tour-info { flex-direction: column; gap: 15px; }
-            .tour-actions { flex-direction: column; width: 100%; gap: 15px; }
-            .btn-tickets { width: 100%; }
-            .venue-links { justify-content: center; }
             .tour-city { font-size: 1.8rem; }
+            .btn-tickets { min-width: 100%; }
         }
     </style>
 </head>
@@ -295,14 +347,20 @@
                     <div class="tour-city-box">
                         <span class="tour-city">Madrid</span>
                         <span class="tour-place">Palacio Vistalegre</span>
+                        <div class="ticket-prices">
+                            <span class="price-badge">Pista General: <strong>26.50€</strong></span>
+                            <span class="price-badge">Grada: <strong>40€</strong></span>
+                            <span class="price-badge">Early Entry: <strong>52€</strong></span>
+                            <span class="price-badge">Ticket VIP: <strong>120€</strong></span>
+                        </div>
                         <div class="venue-links">
                             <a href="https://www.palaciovistalegre.com/" target="_blank" class="venue-link"><i class="fas fa-globe"></i> WEB RECINTO</a>
-                            <a href="https://maps.google.com/?q=Palacio+Vistalegre+Madrid" target="_blank" class="venue-link"><i class="fas fa-map-marker-alt"></i> MAPA</a>
+                            <a href="https://maps.app.goo.gl/yYvP2z8X6p9m9N5Y8" target="_blank" class="venue-link"><i class="fas fa-map-marker-alt"></i> MAPA</a>
                         </div>
                     </div>
                 </div>
                 <div class="tour-actions">
-                    <a href="https://link.fans/chiara-no-fue-real-tour" target="_blank" class="btn-tickets">Comprar Entradas</a>
+                    <a href="https://chiaraoliveroficial.com/pages/27-de-noviembre-2026-madrid-palacio-vistalegre" target="_blank" class="btn-tickets">Comprar Entradas</a>
                 </div>
             </div>
 
@@ -315,14 +373,20 @@
                     <div class="tour-city-box">
                         <span class="tour-city">Barcelona</span>
                         <span class="tour-place">Sant Jordi Club</span>
+                        <div class="ticket-prices">
+                            <span class="price-badge">General: <strong>28€</strong></span>
+                            <span class="price-badge">Grada Baja: <strong>36€</strong></span>
+                            <span class="price-badge">Early Entry: <strong>52€</strong></span>
+                            <span class="price-badge">Entrada VIP: <strong>120€</strong></span>
+                        </div>
                         <div class="venue-links">
                             <a href="https://palausantjordi.barcelona/es/sant-jordi-club" target="_blank" class="venue-link"><i class="fas fa-globe"></i> WEB RECINTO</a>
-                            <a href="https://maps.google.com/?q=Sant+Jordi+Club+Barcelona" target="_blank" class="venue-link"><i class="fas fa-map-marker-alt"></i> MAPA</a>
+                            <a href="https://maps.app.goo.gl/9D6U8vS7p5m9N5Y8" target="_blank" class="venue-link"><i class="fas fa-map-marker-alt"></i> MAPA</a>
                         </div>
                     </div>
                 </div>
                 <div class="tour-actions">
-                    <a href="https://link.fans/chiara-no-fue-real-tour" target="_blank" class="btn-tickets">Comprar Entradas</a>
+                    <a href="https://chiaraoliveroficial.com/pages/28-de-noviembre-2026-barcelona-sant-jordi-club" target="_blank" class="btn-tickets">Comprar Entradas</a>
                 </div>
             </div>
 
@@ -342,6 +406,16 @@
                 </div>
             </div>
         </div>
+
+        <section class="minor-policy">
+            <h4><i class="fas fa-info-circle"></i> POLÍTICA DE MENORES</h4>
+            <p>Los menores de 16 años sólo podrán acceder al recinto acompañados de su padre, madre o tutor legal, previa cumplimentación del formulario correspondiente (solo requerido en Barcelona).</p>
+            <div class="form-links">
+                <a href="https://palausantjordi.barcelona/es/informacion/acceso-de-menores/" target="_blank" class="form-link">
+                    <i class="fas fa-file-download"></i> AUTORIZACIÓN (BARCELONA)
+                </a>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -366,7 +440,7 @@
     <script>
         window.onscroll = function () {
             var btn = document.getElementById("scrollBtn");
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 150) {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 250) {
                 btn.style.opacity = "0";
                 btn.style.pointerEvents = "none";
             } else {
