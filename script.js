@@ -36,28 +36,41 @@
     const nav    = document.getElementById('site-nav');
     if (!toggle || !nav) return;
 
+    function lockScroll(lock) {
+      if (lock) {
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.top = `-${window.scrollY}px`;
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+      } else {
+        const top = parseInt(document.body.style.top || '0') * -1;
+        document.documentElement.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, top || 0);
+      }
+    }
+
     toggle.addEventListener('click', () => {
       const isOpen = nav.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', String(isOpen));
-      // Bloquea el scroll del body cuando el menú está abierto
-      document.body.style.overflow = isOpen ? 'hidden' : '';
+      lockScroll(isOpen);
     });
 
-    // Cierra el menú al hacer click en un enlace
     nav.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', () => {
         nav.classList.remove('is-open');
         toggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+        lockScroll(false);
       });
     });
 
-    // Cierra con Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && nav.classList.contains('is-open')) {
         nav.classList.remove('is-open');
         toggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+        lockScroll(false);
         toggle.focus();
       }
     });
