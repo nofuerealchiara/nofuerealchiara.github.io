@@ -1,0 +1,25 @@
+User-agent: *
+# Bloquear directorios que no quieres indexar
+Disallow: /audio/
+Disallow: /carteles/
+Disallow: /margaritas/
+Disallow: /no-fue-real/
+Disallow: /nofuereal/
+Disallow: /puzzle/
+Disallow: /ranking/
+Disallow: /setlist/
+Disallow: /tracklist/
+
+# Bloquear archivos HTML secundarios
+Disallow: /404.html
+Disallow: /404-2.html
+Disallow: /index2.html
+Disallow: /style2.css
+
+# Permitir explícitamente lo que te interesa (por si acaso)
+Allow: /$
+Allow: /tour/
+Allow: /assets/
+
+# Sitemap
+Sitemap: https://nofuereal.com/sitemap.xml
