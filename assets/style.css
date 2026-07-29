@@ -819,6 +819,18 @@ body.is-easter-egg-dark::before { opacity: 0.5; }
   .countdown-clock { gap: 0.6rem; }
   .countdown-sep { display: none; }
   .hero-masthead { flex-direction: column; align-items: flex-start; }
+  .modal {
+    width: calc(100% - 1.5rem);
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+    max-height: 90vh;
+  }
+  .archive-btn span {
+    display: none; /* Oculta el texto largo en móvil y deja solo el icono */
+  }
+  .archive-btn {
+    padding: 0.6em 0.8em;
+  }
 }
 
 /* ─────────────────────────────────────────
