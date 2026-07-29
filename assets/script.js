@@ -182,20 +182,112 @@
     setTimeout(() => { el.classList.remove('is-visible'); setTimeout(() => el.remove(), 500); }, 5000);
   }
 
-  /* 9 · ARCHIVO DE EVENTOS PASADOS + MODAL (solo /tour) */
+  /* 9 · ARCHIVO DE EVENTOS PASADOS + MODAL (con setlists, fotos y hashtags en X) */
   (function initTourArchive() {
     const overlay = document.getElementById('modal-overlay');
     const closeBtn = document.getElementById('modal-close');
     if (!overlay || !closeBtn) return;
 
-    const open = (city, dateStr) => {
+    // Repertorios, fotos y hashtags específicos para cada ciudad europea
+    const tourSetlists = {
+      "dublin": {
+        setlist: [
+          "Margaritas", "Cada vez", "About time", "3 de febrero", "Otro día",
+          "Todas las versiones de mi", "Galway girl", "The man who can't be moved",
+          "Sweet guitar'o boy", "Breathless", "La invitada", "No fue real",
+          "Linger", "Tulipanes", "Como aprender a volar", "Puzzle", "Bucle", "Fa dies (acapella)"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HGn7dzLW4AAx8Mj?format=jpg&name=4096x4096",
+          "https://pbs.twimg.com/media/HGnQviAXAAET1Vr?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGnD47IXQAAcLcb?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGn7d1BXQAAlOSz?format=jpg&name=large"
+        ],
+        hashtag: "NoFueRealTourDublin"
+      },
+      "londres": {
+        setlist: [
+          "Margaritas", "Cada vez", "About time", "3 de febrero", "Otro día",
+          "Todas las versiones de mi", "Galway girl", "The man who can't be moved",
+          "Sweet guitar'o boy", "Breathless", "La invitada", "No fue real",
+          "Linger", "Tulipanes", "Como aprender a volar", "Puzzle", "Bucle", "Fa dies (acapella)"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HGsv_idWEAAtsBK?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGsrsyMWsAAFF1n?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGst57oXYAAlvsl?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGsrsyPWUAAtZrT?format=jpg&name=large"
+        ],
+        hashtag: "NoFueRealTourLondres"
+      },
+      "paris": {
+        setlist: [
+          "Margaritas", "Cada vez / About time", "3 de febrero", "Otro día",
+          "Todas las versiones de mi", "Un minuto más", "Sweet guitar'o boy",
+          "Invitada", "La vie en rose (Cover)", "No fue real", "Tulipanes",
+          "Les Champs Elysées (Cover)", "CAAV", "Puzzle", "Bucle (Bis)"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HGxyQF0bQAAZ_ig?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HHAPRvxaMAAyjIS?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGxY7UkaMAAvTvD?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HGx1VNLbgAA_Tg4?format=jpg&name=large"
+        ],
+        hashtag: "NoFueRealTourParis"
+      }
+    };
+
+    const open = (city, dateStr, cityKey) => {
       const c = document.getElementById('modal-city');
       const dt = document.getElementById('modal-date');
       if (c) c.textContent = city;
       if (dt) dt.textContent = dateStr;
+
+      // Cargar el setlist personalizado correspondiente
+      const setlistContainer = overlay.querySelector('.modal-setlist');
+      if (setlistContainer && tourSetlists[cityKey]) {
+        setlistContainer.innerHTML = '';
+        tourSetlists[cityKey].setlist.forEach(song => {
+          const li = document.createElement('li');
+          li.textContent = song;
+          setlistContainer.appendChild(li);
+        });
+      }
+
+      // Cargar la galería de fotos correspondiente de forma centrada
+      const galleryContainer = overlay.querySelector('.modal-gallery');
+      if (galleryContainer && tourSetlists[cityKey] && tourSetlists[cityKey].photos) {
+        galleryContainer.innerHTML = '';
+        tourSetlists[cityKey].photos.forEach(src => {
+          const div = document.createElement('div');
+          div.className = 'modal-gallery-placeholder';
+          div.innerHTML = `<img src="${src}" alt="Foto del concierto" style="width: 100%; height: 100%; object-fit: cover; display: block; margin: 0 auto; border-radius: 6px;" onerror="this.parentElement.textContent='Foto del concierto';" />`;
+          galleryContainer.appendChild(div);
+        });
+      }
+
+      // Cargar el enlace al hashtag en X (Twitter)
+      const socialContainer = document.getElementById('modal-social-link');
+      if (socialContainer && tourSetlists[cityKey] && tourSetlists[cityKey].hashtag) {
+        const tag = tourSetlists[cityKey].hashtag;
+        socialContainer.innerHTML = `
+          <a href="https://x.com/search?q=%23${tag}" target="_blank" rel="noopener" class="cta-secondary" style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+            Ver interacción en X · #${tag}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 14px; height: 14px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        `;
+      } else if (socialContainer) {
+        socialContainer.innerHTML = '';
+      }
+
+      // Asegurar que el modal siempre se abra desde arriba
+      const modalContent = overlay.querySelector('.modal');
+      if (modalContent) modalContent.scrollTop = 0;
+
       overlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
     };
+
     const close = () => { overlay.classList.remove('is-open'); document.body.style.overflow = ''; };
 
     closeBtn.addEventListener('click', close);
@@ -203,6 +295,7 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('is-open')) close(); });
 
     const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    
     document.querySelectorAll('.date-row').forEach((row) => {
       const dateStr = row.getAttribute('data-date');
       if (!dateStr) return;
@@ -217,11 +310,18 @@
       const dd = new Date(p[0], p[1] - 1, p[2]);
       const formatted = dd.getDate() + ' de ' + months[dd.getMonth()] + ' de ' + dd.getFullYear();
 
+      // Detectar la clave de la ciudad para asignar su setlist, fotos y hashtag
+      let cityKey = '';
+      const cityLower = city.toLowerCase();
+      if (cityLower.includes('dublín') || cityLower.includes('dublin')) cityKey = 'dublin';
+      else if (cityLower.includes('londres')) cityKey = 'londres';
+      else if (cityLower.includes('parís') || cityLower.includes('paris')) cityKey = 'paris';
+
       action.innerHTML = '';
       const btn = document.createElement('button');
       btn.className = 'archive-btn';
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg><span>Ver Archivo del Evento</span>';
-      btn.addEventListener('click', () => open(city, formatted));
+      btn.addEventListener('click', () => open(city, formatted, cityKey));
       action.appendChild(btn);
     });
   })();
