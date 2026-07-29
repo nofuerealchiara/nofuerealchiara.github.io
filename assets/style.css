@@ -635,7 +635,7 @@ ul, ol { list-style: none; }
   color: var(--c-cream); line-height: 1; min-width: 2.4ch; text-align: center; position: relative;
   text-shadow: 0 0 44px rgba(255,92,154,0.35);
 }
-.countdown-num::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 1.5em; height: 1px; background: var(--c-rose); }
+.countdown-num::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 1.4em; height: 1px; background: var(--c-rose); }
 .countdown-label { font-family: var(--f-mono); font-size: var(--fs-xs); letter-spacing: 0.2em; text-transform: uppercase; color: var(--c-azure-lt); margin-top: 0.6rem; }
 .countdown-sep { font-family: var(--f-display); font-size: clamp(var(--fs-2xl),6vw,var(--fs-3xl)); color: var(--c-rose-dark); line-height: 1; padding-bottom: 0.7rem; opacity: 0.6; }
 .countdown-expired-msg { font-family: var(--f-display); font-size: var(--fs-lg); font-style: italic; color: var(--c-rose-lt); margin-bottom: 1.75rem; }
@@ -790,6 +790,16 @@ body.is-easter-egg-dark::before { opacity: 0.5; }
   .date-row__day { font-size: var(--fs-xl); }
   .date-row__city { font-size: var(--fs-md); }
   .ticket-btn span { display: none; }
+  .countdown-num {
+    font-size: clamp(2.5rem, 12vw, 3.5rem);
+    min-width: 2ch;
+  }
+  .next-show-card {
+    padding: 1.5rem 1rem;
+  }
+  .next-show-event {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+  }
   .ticket-btn svg { width: 18px; height: 18px; }
   .ticket-btn { padding: 0.7em 0.8em; }
   .countdown-clock { gap: 0.6rem; }
