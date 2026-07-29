@@ -207,10 +207,10 @@
       },
       "londres": {
         setlist: [
-          "Margaritas", "Cada vez", "About time", "3 de febrero", "Otro día",
-          "Todas las versiones de mi", "Galway girl", "The man who can't be moved",
-          "Sweet guitar'o boy", "Breathless", "La invitada", "No fue real",
-          "Linger", "Tulipanes", "Como aprender a volar", "Puzzle", "Bucle", "Fa dies (acapella)"
+          "Margaritas", "Cada vez / About time", "3 de febrero / Otro día", "Todas las versiones de mi",
+          "Sweet guitar'o boy", "Say you'll be there (cover)",
+          "La invitada", "No fue real", "Beattles mashup", "Tulipanes",
+          "Como aprender a volar", "Puzzle", "Bucle (bis)"
         ],
         photos: [
           "https://pbs.twimg.com/media/HGsv_idWEAAtsBK?format=jpg&name=large",
