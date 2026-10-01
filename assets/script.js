@@ -89,8 +89,8 @@
     const expired = document.getElementById('countdown-expired');
     if (!d || !h || !m || !s) return;
 
-    // 30 sep 2026, 21:00 CDMX (UTC-6) = 03:00 UTC del 1 oct
-    const TARGET = new Date('2026-10-01T03:00:00Z').getTime();
+    // Próximo show: 3 oct 2026, 21:00 Buenos Aires (UTC-3) = 00:00 UTC del 4 oct
+    const TARGET = new Date('2026-10-04T00:00:00Z').getTime();
     const pad = (n) => String(n).padStart(2, '0');
 
     const tick = () => {
@@ -188,8 +188,37 @@
     const closeBtn = document.getElementById('modal-close');
     if (!overlay || !closeBtn) return;
 
-    // Repertorios, fotos y hashtags específicos para cada ciudad europea
+    // Repertorios, fotos y hashtags específicos para cada show finalizado
     const tourSetlists = {
+      "mexico": {
+        setlist: [
+          "me puse a escribir (intro)",
+          "margaritas",
+          "si te tuviera aquí",
+          "como aprender a volar",
+          "parte de mi",
+          "3 de febrero",
+          "piano cover",
+          "es mejor así x la invitada (mashup)",
+          "bucle",
+          "lo siento x ser yo",
+          "calle luna (intro \"kiss me\")",
+          "me & my girls",
+          "un minuto +",
+          "tulipanes",
+          "puzzle (ft. nicole zagato)",
+          "2+2=5",
+          "no fue real",
+          "una más"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HThOtUDaAAAJoD8?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HThQoFiWoAAkSbX?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HThF2OUWoAIjWgF?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HTggq-iXgAEobHn?format=jpg&name=medium"
+        ],
+        hashtag: "NFRTourMéxico"
+      },
       "dublin": {
         setlist: [
           "Margaritas", "Cada vez", "About time", "3 de febrero", "Otro día",
@@ -271,7 +300,7 @@
       if (socialContainer && tourSetlists[cityKey] && tourSetlists[cityKey].hashtag) {
         const tag = tourSetlists[cityKey].hashtag;
         socialContainer.innerHTML = `
-          <a href="https://x.com/search?q=%23${tag}" target="_blank" rel="noopener" class="cta-secondary" style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+          <a href="https://x.com/search?q=%23${encodeURIComponent(tag)}" target="_blank" rel="noopener" class="cta-secondary" style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
             Ver interacción en X · #${tag}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 14px; height: 14px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
@@ -313,7 +342,8 @@
       // Detectar la clave de la ciudad para asignar su setlist, fotos y hashtag
       let cityKey = '';
       const cityLower = city.toLowerCase();
-      if (cityLower.includes('dublín') || cityLower.includes('dublin')) cityKey = 'dublin';
+      if (cityLower.includes('méxico') || cityLower.includes('mexico')) cityKey = 'mexico';
+      else if (cityLower.includes('dublín') || cityLower.includes('dublin')) cityKey = 'dublin';
       else if (cityLower.includes('londres')) cityKey = 'londres';
       else if (cityLower.includes('parís') || cityLower.includes('paris')) cityKey = 'paris';
 
