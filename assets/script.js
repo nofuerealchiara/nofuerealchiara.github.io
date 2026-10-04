@@ -89,8 +89,8 @@
     const expired = document.getElementById('countdown-expired');
     if (!d || !h || !m || !s) return;
 
-    // Próximo show: 3 oct 2026, 21:00 Buenos Aires (UTC-3) = 00:00 UTC del 4 oct
-    const TARGET = new Date('2026-10-04T00:00:00Z').getTime();
+    // Próximo show: 6 oct 2026, 21:00 Santiago de Chile (UTC-3) = 00:00 UTC del 7 oct
+    const TARGET = new Date('2026-10-07T00:00:00Z').getTime();
     const pad = (n) => String(n).padStart(2, '0');
 
     const tick = () => {
@@ -190,6 +190,36 @@
 
     // Repertorios, fotos y hashtags específicos para cada show finalizado
     const tourSetlists = {
+      "argentina": {
+        setlist: [
+          "me puse a escribir (intro)",
+          "margaritas",
+          "si te tuviera aquí",
+          "como aprender a volar",
+          "parte de mi",
+          "3 de febrero",
+          "Flaca (cover)",
+          "es mejor así x la invitada (mashup)",
+          "bucle",
+          "lo siento x ser yo",
+          "calle luna (intro \"kiss me\")",
+          "me & my girls",
+          "un minuto +",
+          "tulipanes",
+          "Entre tu y yo (cover)",
+          "no fue real",
+          "2+2=5",
+          "puzzle",
+          "una más"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HTwDaY_XYAApWez?format=jpg&name=4096x4096",
+          "https://pbs.twimg.com/media/HTvy-HCXcAARak8?format=jpg&name=large",
+          "https://pbs.twimg.com/media/HTwGkmVXYAAvNz6?format=jpg&name=4096x4096",
+          "https://pbs.twimg.com/media/HTwI3LhXoAAIW5j?format=jpg&name=large"
+        ],
+        hashtag: "NFRTourArgentina"
+      },
       "mexico": {
         setlist: [
           "me puse a escribir (intro)",
@@ -198,7 +228,7 @@
           "como aprender a volar",
           "parte de mi",
           "3 de febrero",
-          "piano cover",
+          "Ven devórame otra vez (cover)",
           "es mejor así x la invitada (mashup)",
           "bucle",
           "lo siento x ser yo",
@@ -342,7 +372,8 @@
       // Detectar la clave de la ciudad para asignar su setlist, fotos y hashtag
       let cityKey = '';
       const cityLower = city.toLowerCase();
-      if (cityLower.includes('méxico') || cityLower.includes('mexico')) cityKey = 'mexico';
+      if (cityLower.includes('buenos aires') || cityLower.includes('argentina')) cityKey = 'argentina';
+      else if (cityLower.includes('méxico') || cityLower.includes('mexico')) cityKey = 'mexico';
       else if (cityLower.includes('dublín') || cityLower.includes('dublin')) cityKey = 'dublin';
       else if (cityLower.includes('londres')) cityKey = 'londres';
       else if (cityLower.includes('parís') || cityLower.includes('paris')) cityKey = 'paris';
