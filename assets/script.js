@@ -89,8 +89,8 @@
     const expired = document.getElementById('countdown-expired');
     if (!d || !h || !m || !s) return;
 
-    // Próximo show: 6 oct 2026, 21:00 Santiago de Chile (UTC-3) = 00:00 UTC del 7 oct
-    const TARGET = new Date('2026-10-07T00:00:00Z').getTime();
+    // Próximo show: 27 nov 2026, 21:00 Madrid (CET / UTC+1) = 20:00 UTC
+    const TARGET = new Date('2026-11-27T20:00:00Z').getTime();
     const pad = (n) => String(n).padStart(2, '0');
 
     const tick = () => {
@@ -190,6 +190,35 @@
 
     // Repertorios, fotos y hashtags específicos para cada show finalizado
     const tourSetlists = {
+      "chile": {
+        setlist: [
+          "me puse a escribir (intro)",
+          "margaritas",
+          "no fue real",
+          "si te tuviera aquí",
+          "parte de mí",
+          "3 de febrero",
+          "Melancolía (cover)",
+          "es mejor así",
+          "bucle",
+          "lo siento por ser yo",
+          "calle luna (intro \"kiss me\")",
+          "me & my girls",
+          "un minuto +",
+          "tulipanes",
+          "2+2=5",
+          "como aprender a volar",
+          "puzzle",
+          "una más"
+        ],
+        photos: [
+          "https://pbs.twimg.com/media/HUANNXcX0AAUHI_?format=jpg&name=900x900",
+          "https://pbs.twimg.com/media/HUAFMz0WEAA9BRS?format=jpg&name=small",
+          "https://pbs.twimg.com/media/HUANNXTXIAAE1n9?format=jpg&name=900x900",
+          "https://pbs.twimg.com/media/HUAFMzwWsAAd8Ol?format=jpg&name=small"
+        ],
+        hashtag: "NFRTourChile"
+      },
       "argentina": {
         setlist: [
           "me puse a escribir (intro)",
@@ -372,7 +401,8 @@
       // Detectar la clave de la ciudad para asignar su setlist, fotos y hashtag
       let cityKey = '';
       const cityLower = city.toLowerCase();
-      if (cityLower.includes('buenos aires') || cityLower.includes('argentina')) cityKey = 'argentina';
+      if (cityLower.includes('santiago') || cityLower.includes('chile')) cityKey = 'chile';
+      else if (cityLower.includes('buenos aires') || cityLower.includes('argentina')) cityKey = 'argentina';
       else if (cityLower.includes('méxico') || cityLower.includes('mexico')) cityKey = 'mexico';
       else if (cityLower.includes('dublín') || cityLower.includes('dublin')) cityKey = 'dublin';
       else if (cityLower.includes('londres')) cityKey = 'londres';
