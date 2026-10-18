@@ -2647,3 +2647,150 @@ body::after {
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MYSTERY WIDGET · .diary-teaser
+═══════════════════════════════════════════════════════════ */
+.diary-teaser {
+  position: fixed;
+  left: calc(var(--frame) + 0.5rem);
+  bottom: 1rem;
+  z-index: 880;
+  /* sobre el contenido, bajo el menú móvil (1000) */
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  padding: 1rem 2.75rem 1rem 1.15rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: color-mix(in srgb, var(--c-bg) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur-slow) var(--ease-out-expo),
+    transform var(--dur-slow) var(--ease-out-expo);
+}
+
+.diary-teaser.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Borde degradado magenta → oro (solo el trazo, sin teñir el fondo) */
+.diary-teaser::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--c-rose), var(--c-gold));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.diary-teaser__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: var(--fs-md);
+  line-height: 1.1;
+  color: var(--c-cream);
+}
+
+.diary-teaser__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--c-rose);
+  box-shadow: 0 0 8px var(--c-rose);
+  animation: pulseDot 2s infinite;
+  /* reutiliza la animación del banner */
+}
+
+.diary-teaser__count {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-gold-lt);
+  font-variant-numeric: tabular-nums;
+  /* evita que los dígitos "bailen" */
+}
+
+.diary-teaser__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  align-self: flex-start;
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  color: var(--c-rose-lt);
+  border-bottom: 1px solid var(--c-rose-dark);
+  padding-bottom: 1px;
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+
+.diary-teaser__link svg {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--dur-med) var(--ease-out-expo);
+}
+
+.diary-teaser__link:hover {
+  color: var(--c-cream);
+  border-color: var(--c-cream);
+}
+
+.diary-teaser__link:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.diary-teaser__close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--c-text-dim);
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.diary-teaser__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.diary-teaser__close:hover {
+  color: var(--c-rose-lt);
+  background: rgba(255, 92, 154, 0.12);
+}
+
+@media (max-width: 620px) {
+  .diary-teaser {
+    left: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+  }
+}
+
+.diary-teaser__date {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  margin-top: -0.15rem;
+}
