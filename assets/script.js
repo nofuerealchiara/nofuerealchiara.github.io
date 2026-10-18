@@ -7,6 +7,9 @@
 (function () {
   'use strict';
 
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   /* 1 · HEADER Y BANNER: transparente al inicio → glass al hacer scroll */
   (function initHeader() {
     const header = document.getElementById('site-header');
@@ -148,24 +151,31 @@
     }, { passive: true });
   })();
 
-  /* 7 · EASTER EGG: teclea "real" → la realidad se invierte */
-  (function initEasterEgg() {
+  /* 7 · MODO ALTERNATIVO: teclea "real" → paleta clara (sin filtros globales) */
+  (function initAltMode() {
     const SECRET = 'real';
+    const KEY = 'nfr-alt-mode';
+    const root = document.documentElement;
     let buf = '';
+
     document.addEventListener('keydown', (e) => {
-      if (!e.key || e.key.length !== 1) return;
+      if (!e.key || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+
       buf = (buf + e.key.toLowerCase()).slice(-SECRET.length);
       if (buf !== SECRET) return;
       buf = '';
-      const body = document.body;
-      body.classList.remove('is-easter-egg-dark');
-      void body.offsetHeight;
-      body.classList.add('is-easter-egg');
-      setTimeout(() => {
-        body.classList.remove('is-easter-egg');
-        body.classList.toggle('is-easter-egg-dark');
-        showToast('La realidad es una ilusión. Gracias por apoyar a Chiara.');
-      }, 600);
+
+      const on = !root.classList.contains('theme-alt');
+      const swap = () => {
+        root.classList.toggle('theme-alt', on);
+        try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (_) { }
+      };
+      if (document.startViewTransition && !prefersReduced) document.startViewTransition(swap);
+      else swap();
+
+      showToast(on ? 'Modo alternativo activado. Teclea “real” para volver.' : 'La realidad vuelve a su sitio.');
     });
   })();
 
@@ -382,8 +392,8 @@
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('is-open')) close(); });
 
-    const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
     document.querySelectorAll('.date-row').forEach((row) => {
       const dateStr = row.getAttribute('data-date');
       if (!dateStr) return;
@@ -415,6 +425,166 @@
       btn.addEventListener('click', () => open(city, formatted, cityKey));
       action.appendChild(btn);
     });
+  })();
+
+  /* 10 · MARQUEE CINÉTICO (duplica la lista para un bucle sin saltos) */
+  (function initMarquee() {
+    document.querySelectorAll('[data-marquee]').forEach((track) => {
+      const list = track.querySelector('.marquee__list');
+      if (!list) return;
+      const clone = list.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+      const setSpeed = () => track.style.setProperty('--marquee-speed', (list.offsetWidth / 70).toFixed(1) + 's'); // ~70 px/s
+      setSpeed();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(setSpeed);
+      window.addEventListener('resize', setSpeed, { passive: true });
+    });
+  })();
+
+  /* 11 · MURO DE LETRAS (palabra a palabra al hacer scroll) */
+  (function initLyricsWall() {
+    const lines = document.querySelectorAll('.lyrics-line');
+    if (!lines.length) return;
+
+    lines.forEach((line) => {
+      const text = line.textContent.trim();
+      line.textContent = '';
+      const sr = document.createElement('span');          // texto íntegro para lectores de pantalla
+      sr.className = 'sr-only';
+      sr.textContent = text;
+      line.appendChild(sr);
+      const words = text.split(/\s+/);
+      words.forEach((word, i) => {
+        const s = document.createElement('span');
+        s.className = 'w';
+        s.setAttribute('aria-hidden', 'true');
+        s.style.setProperty('--i', i);
+        s.textContent = word;
+        line.appendChild(s);
+        if (i < words.length - 1) line.appendChild(document.createTextNode(' '));
+      });
+    });
+
+    if (prefersReduced || !('IntersectionObserver' in window)) {
+      lines.forEach((l) => l.classList.add('is-visible'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.5, rootMargin: '0px 0px -15% 0px' }
+    );
+    lines.forEach((l) => io.observe(l));
+  })();
+
+  /* 12 · PARALLAX DEL AURA (suavizado con lerp + rAF) */
+  (function initAuraParallax() {
+    if (!finePointer || prefersReduced) return;
+    const root = document.documentElement;
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
+    const loop = () => {
+      x += (tx - x) * 0.06;
+      y += (ty - y) * 0.06;
+      root.style.setProperty('--aura-x', x.toFixed(3));
+      root.style.setProperty('--aura-y', y.toFixed(3));
+      raf = (Math.abs(tx - x) > 0.002 || Math.abs(ty - y) > 0.002) ? requestAnimationFrame(loop) : 0;
+    };
+    window.addEventListener('mousemove', (e) => {
+      tx = (e.clientX / window.innerWidth - 0.5) * 2;   // -1 … 1
+      ty = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+  })();
+
+  /* 13 · BOTONES MAGNÉTICOS (.cta-primary) */
+  (function initMagnetic() {
+    if (!finePointer || prefersReduced) return;
+    const btns = [...document.querySelectorAll('.cta-primary')];
+    if (!btns.length) return;
+    const PAD = 70, STRENGTH = 0.3, MAX = 14;
+    const clamp = (v) => Math.max(-MAX, Math.min(MAX, v));
+
+    btns.forEach((b) => { b._tx = 0; b._ty = 0; });
+    document.addEventListener('mousemove', (e) => {
+      btns.forEach((b) => {
+        const r = b.getBoundingClientRect();
+        const cx = r.left + r.width / 2 - b._tx;       // centro "real", sin el desplazamiento actual
+        const cy = r.top + r.height / 2 - b._ty;
+        const dx = e.clientX - cx, dy = e.clientY - cy;
+        const near = Math.abs(dx) < r.width / 2 + PAD && Math.abs(dy) < r.height / 2 + PAD;
+        b._tx = near ? clamp(dx * STRENGTH) : 0;
+        b._ty = near ? clamp(dy * STRENGTH) : 0;
+        b.style.setProperty('--tx', b._tx.toFixed(1) + 'px');
+        b.style.setProperty('--ty', b._ty.toFixed(1) + 'px');
+      });
+    }, { passive: true });
+  })();
+
+  /* 14 · SNIPPET PLAYER nativo (10 s, sin iframes) */
+  (function initSnippetPlayer() {
+    const root = document.querySelector('[data-snippet]');
+    if (!root) return;
+    const btn = root.querySelector('.snippet__btn');
+    const label = root.querySelector('.snippet__label');
+    const SRC = root.dataset.src;
+    const DUR = parseFloat(root.dataset.duration) || 10;
+    const START = parseFloat(root.dataset.start) || 0;
+    const FADE = 0.6;                       // segundos de fade-out final
+    let audio = null, raf = 0;
+
+    const setP = (p) => btn.style.setProperty('--p', p.toFixed(4));
+    const setState = (on) => {
+      root.classList.toggle('is-playing', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.setAttribute('aria-label', on ? 'Detener fragmento' : `Escuchar fragmento de ${DUR} segundos`);
+    };
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      if (audio) { audio.pause(); audio.volume = 1; audio.currentTime = START; }
+      setState(false);
+      setP(0);
+    };
+    const tick = () => {
+      const t = audio.currentTime - START;
+      setP(Math.min(t / DUR, 1));
+      const left = DUR - t;
+      if (left <= FADE) audio.volume = Math.max(left / FADE, 0);
+      if (t >= DUR || audio.ended) { stop(); return; }
+      raf = requestAnimationFrame(tick);
+    };
+    const ensureAudio = () => {
+      if (audio) return audio;
+      audio = new Audio();
+      audio.preload = 'none';
+      audio.src = SRC;
+      audio.addEventListener('ended', stop);
+      audio.addEventListener('error', () => {
+        stop();
+        btn.disabled = true;
+        if (label) label.textContent = 'Audio no disponible';
+      });
+      return audio;
+    };
+
+    btn.addEventListener('click', async () => {
+      if (root.classList.contains('is-playing')) { stop(); return; }
+      const a = ensureAudio();
+      const seek = () => { a.currentTime = START; };
+      if (a.readyState >= 1) seek(); else a.addEventListener('loadedmetadata', seek, { once: true });
+      a.volume = 1;
+      try {
+        await a.play();
+        setState(true);
+        raf = requestAnimationFrame(tick);
+      } catch (_) {
+        stop();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => { if (document.hidden && audio) stop(); });
+    window.addEventListener('pagehide', () => { if (audio) stop(); });
   })();
 
 })();
