@@ -588,3 +588,45 @@
   })();
 
 })();
+
+/* MYSTERY WIDGET: contador + cierre persistente */
+(function initDiaryTeaser() {
+  'use strict';
+  const box = document.getElementById('diary-teaser');
+  if (!box) return;
+
+  const TARGET = new Date('2026-11-20T00:00:00').getTime();   // hora local del visitante
+
+  const out = box.querySelector('[data-diary-count]');
+  const pad = (n) => String(n).padStart(2, '0');
+  let timer = 0;
+
+  const tick = () => {
+    const diff = TARGET - Date.now();
+    if (diff <= 0) {
+      out.textContent = 'Ya está aquí';
+      clearInterval(timer);
+      return;
+    }
+    const t = Math.floor(diff / 1000);
+    out.textContent =
+      pad(Math.floor(t / 86400)) + 'd ' +
+      pad(Math.floor((t % 86400) / 3600)) + 'h ' +
+      pad(Math.floor((t % 3600) / 60)) + 'm ' +
+      pad(t % 60) + 's';
+  };
+  tick();
+  timer = setInterval(tick, 1000);
+
+  // Aparece con un pequeño retraso para no competir con la animación del hero
+  setTimeout(() => {
+    box.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('is-visible')));
+  }, 2500);
+
+  box.querySelector('.diary-teaser__close').addEventListener('click', () => {
+    clearInterval(timer);
+    box.classList.remove('is-visible');
+    setTimeout(() => { box.hidden = true; }, 600);
+  });
+})();
