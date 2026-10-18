@@ -16,6 +16,10 @@
     <loc>https://nofuereal.com/tour/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://nofuereal.com/assets/no-fue-real-tour-2026.jpg</image:loc>
+      <image:title>No Fue Real Tour 2026</image:title>
+    </image:image>
   </url>
 
 </urlset>
