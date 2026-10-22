@@ -117,7 +117,7 @@
 
   /* 5 · SMOOTH SCROLL para anclas internas */
   (function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach((a) =>
+    document.querySelectorAll('a[href^="#"]:not([data-edition-link])').forEach((a) =>
       a.addEventListener('click', (e) => {
         const id = a.getAttribute('href').slice(1);
         if (!id) return;
@@ -587,46 +587,327 @@
     window.addEventListener('pagehide', () => { if (audio) stop(); });
   })();
 
-})();
+  /* ═══════════════════════════════════════════════════════════════
+     15 · EDICIÓN DELUXE — (no) fue real
+     Toda la configuración está aquí: fechas (hora peninsular, CET = UTC+1
+     en noviembre) y enlaces. Cambia solo este bloque para actualizar la web.
 
-/* MYSTERY WIDGET: contador + cierre persistente */
-(function initDiaryTeaser() {
-  'use strict';
-  const box = document.getElementById('diary-teaser');
-  if (!box) return;
-
-  const TARGET = new Date('2026-11-20T00:00:00').getTime();   // hora local del visitante
-
-  const out = box.querySelector('[data-diary-count]');
-  const pad = (n) => String(n).padStart(2, '0');
-  let timer = 0;
-
-  const tick = () => {
-    const diff = TARGET - Date.now();
-    if (diff <= 0) {
-      out.textContent = 'Ya está aquí';
-      clearInterval(timer);
-      return;
-    }
-    const t = Math.floor(diff / 1000);
-    out.textContent =
-      pad(Math.floor(t / 86400)) + 'd ' +
-      pad(Math.floor((t % 86400) / 3600)) + 'h ' +
-      pad(Math.floor((t % 3600) / 60)) + 'm ' +
-      pad(t % 60) + 's';
+     Para probar una fase sin esperar, añade a la URL:
+       ?deluxe-now=2026-11-03T12:00:01+01:00   (preventa)
+       ?deluxe-now=2026-11-04T12:00:01+01:00   (venta general)
+       ?deluxe-now=2026-11-20T00:00:01+01:00   (lanzamiento)
+  ═══════════════════════════════════════════════════════════════ */
+  const DELUXE = {
+    dates: {
+      preorder: '2026-11-03T12:00:00+01:00', // Fase 2: abre la preventa
+      sale: '2026-11-04T12:00:00+01:00',     // Fase 2b: venta general
+      release: '2026-11-20T00:00:00+01:00',  // Fase 3: lanzamiento
+    },
+    links: {
+      // TODO: sustituir por la URL específica de la deluxe cuando se publique
+      store: 'https://chiaraoliveroficial.com/collections/no-fue-real',
+      presave: '', // opcional: enlace de pre-save (vacío = no se muestra)
+      // TODO: sustituir por el enlace de streaming de la deluxe el día del lanzamiento
+      listen: 'https://chiaraoliver.lnk.to/NoFueRealAlbum',
+      follow: 'https://instagram.com/nofuerealdiaries',
+    },
   };
-  tick();
-  timer = setInterval(tick, 1000);
 
-  // Aparece con un pequeño retraso para no competir con la animación del hero
-  setTimeout(() => {
-    box.hidden = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('is-visible')));
-  }, 2500);
+  const DELUXE_T = {
+    preorder: Date.parse(DELUXE.dates.preorder),
+    sale: Date.parse(DELUXE.dates.sale),
+    release: Date.parse(DELUXE.dates.release),
+  };
 
-  box.querySelector('.diary-teaser__close').addEventListener('click', () => {
-    clearInterval(timer);
-    box.classList.remove('is-visible');
-    setTimeout(() => { box.hidden = true; }, 600);
-  });
+  // Reloj (con desfase opcional para pruebas vía ?deluxe-now=)
+  const clockOffset = (() => {
+    try {
+      const raw = new URLSearchParams(location.search).get('deluxe-now');
+      if (!raw) return 0;
+      const t = Date.parse(raw.replace(' ', '+')); // "+" llega como espacio en la query
+      return isNaN(t) ? 0 : t - Date.now();
+    } catch (_) { return 0; }
+  })();
+  const deluxeNow = () => Date.now() + clockOffset;
+
+  // countdown → preorder → sale → released
+  function deluxePhase(t) {
+    if (t < DELUXE_T.preorder) return 'countdown';
+    if (t < DELUXE_T.sale) return 'preorder';
+    if (t < DELUXE_T.release) return 'sale';
+    return 'released';
+  }
+
+  const DELUXE_NEXT = { countdown: 'preorder', preorder: 'sale', sale: 'release', released: null };
+
+  // Archivo .ics para "Añadir al calendario"
+  function icsHref(key) {
+    const fmt = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const titles = {
+      preorder: 'Preventa (no) fue real — Chiara Oliver',
+      release: 'Lanzamiento (no) fue real — Chiara Oliver',
+    };
+    const body = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//nofuereal.com//deluxe//ES',
+      'BEGIN:VEVENT',
+      `UID:${key}-no-fue-real-deluxe@nofuereal.com`,
+      `DTSTAMP:${fmt(new Date())}`,
+      `DTSTART:${fmt(new Date(DELUXE_T[key]))}`,
+      `DTEND:${fmt(new Date(DELUXE_T[key] + 3600e3))}`,
+      `SUMMARY:${titles[key]}`,
+      'URL:https://nofuereal.com/#deluxe',
+      'END:VEVENT', 'END:VCALENDAR',
+    ].join('\r\n');
+    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(body);
+  }
+
+  // Contenido de cada fase. Las acciones sin href se omiten.
+  const L = DELUXE.links;
+  const DELUXE_PHASES = {
+    countdown: {
+      eyebrow: 'Edición deluxe · Anunciada',
+      desc: 'La edición deluxe de <em>no fue real</em> llega el <strong>20 de noviembre</strong>. La preventa abre el <strong>2 de noviembre a las 12:00</strong>.',
+      label: 'La preventa abre en',
+      teaser: 'Preventa · 2 nov, 12:00',
+      actions: [
+        { label: 'Preventa · 2 NOV 12:00', primary: true, disabled: true },
+        { label: 'Añadir al calendario', ics: 'preorder' },
+        { label: 'Seguir novedades', href: L.follow, external: true },
+      ],
+    },
+    preorder: {
+      eyebrow: 'Preventa abierta',
+      desc: 'La preventa de <em>(no) fue real</em> ya está abierta en la tienda oficial. La venta general empieza el <strong>3 de noviembre a las 12:00</strong>.',
+      label: 'La venta general empieza en',
+      teaser: 'Preventa abierta',
+      actions: [
+        { label: 'Reservar ahora', href: L.store, primary: true, external: true },
+        { label: 'Pre-save', href: L.presave, external: true },
+        { label: 'Recordar el lanzamiento', ics: 'release' },
+      ],
+    },
+    sale: {
+      eyebrow: 'Ya a la venta',
+      desc: 'Ya puedes reservar <em>(no) fue real</em>. Sale el <strong>20 de noviembre</strong> a medianoche.',
+      label: 'Disponible en',
+      teaser: 'Lanzamiento · 20 nov',
+      actions: [
+        { label: 'Reservar ahora', href: L.store, primary: true, external: true },
+        { label: 'Pre-save', href: L.presave, external: true },
+        { label: 'Recordar el lanzamiento', ics: 'release' },
+      ],
+    },
+    released: {
+      eyebrow: 'Edición deluxe · Fuera ya',
+      desc: '<em>(no) fue real</em> ya está aquí. Escúchala entera o hazte con tu copia.',
+      label: null,
+      teaser: 'Ya disponible',
+      actions: [
+        { label: 'Escuchar deluxe', href: L.listen, primary: true, external: true },
+        { label: 'Comprar', href: L.store, external: true },
+      ],
+    },
+  };
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const splitTime = (ms) => {
+    const t = Math.max(0, Math.floor(ms / 1000));
+    return { d: Math.floor(t / 86400), h: Math.floor((t % 86400) / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
+  };
+  const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+
+  function buildAction(a) {
+    if (!a.disabled && !a.href && !a.ics) return null;
+    const el = document.createElement(a.disabled ? 'span' : 'a');
+    el.className = a.primary ? 'cta-primary' : 'cta-ghost';
+    if (a.disabled) {
+      el.classList.add('is-disabled');
+      el.setAttribute('aria-disabled', 'true');
+    } else if (a.ics) {
+      el.href = icsHref(a.ics);
+      el.download = a.ics === 'preorder' ? 'preventa-no-fue-real.ics' : 'lanzamiento-no-fue-real.ics';
+    } else {
+      el.href = a.href;
+      if (a.external) { el.target = '_blank'; el.rel = 'noopener'; }
+    }
+    const span = document.createElement('span');
+    span.textContent = a.label;
+    el.appendChild(span);
+    if (!a.disabled) el.insertAdjacentHTML('beforeend', ARROW);
+    return el;
+  }
+
+  /* 16 · VISTA DELUXE + AVISO FLOTANTE (un solo reloj para ambos) */
+  (function initDeluxe() {
+    const panel = document.querySelector('[data-deluxe]');
+    const box = document.getElementById('diary-teaser');
+    if (!panel && !box) return;
+    const root = document.documentElement;
+    let current = null;
+
+    const q = (sel) => (panel ? panel.querySelector(sel) : null);
+    const eyebrow = q('[data-deluxe-eyebrow]');
+    const desc = q('[data-deluxe-desc]');
+    const cdWrap = q('[data-deluxe-countdown]');
+    const cdLabel = q('[data-deluxe-countdown-label]');
+    const cd = { d: q('[data-cd="d"]'), h: q('[data-cd="h"]'), m: q('[data-cd="m"]'), s: q('[data-cd="s"]') };
+    const actions = q('[data-deluxe-actions]');
+    const steps = panel ? panel.querySelectorAll('.deluxe-timeline__step') : [];
+    const STEP_KEY = { preorder: 'preorder', sale: 'sale', released: 'release' };
+
+    const tLabel = box && box.querySelector('[data-diary-label]');
+    const tCount = box && box.querySelector('[data-diary-count]');
+
+    const render = (phase, now) => {
+      const p = DELUXE_PHASES[phase];
+      root.dataset.deluxePhase = phase;
+      if (eyebrow) eyebrow.textContent = p.eyebrow;
+      if (desc) desc.innerHTML = p.desc;
+      if (cdWrap) cdWrap.hidden = !p.label;
+      if (cdLabel && p.label) cdLabel.textContent = p.label;
+      if (actions) {
+        actions.textContent = '';
+        p.actions.map(buildAction).filter(Boolean).forEach((el) => actions.appendChild(el));
+      }
+      let nextMarked = false;
+      steps.forEach((li) => {
+        const done = now >= DELUXE_T[STEP_KEY[li.dataset.step]];
+        const isNext = !done && !nextMarked;
+        li.classList.toggle('is-done', done);
+        li.classList.toggle('is-next', isNext);
+        if (isNext) nextMarked = true;
+      });
+      if (tLabel) tLabel.textContent = p.teaser;
+    };
+
+    let timer = 0;
+    const tick = () => {
+      const now = deluxeNow();
+      const phase = deluxePhase(now);
+      if (phase !== current) { current = phase; render(phase, now); }
+      const nextKey = DELUXE_NEXT[phase];
+      if (!nextKey) {
+        if (tCount) tCount.textContent = '¡Ya está aquí!';
+        clearInterval(timer);
+        return;
+      }
+      const t = splitTime(DELUXE_T[nextKey] - now);
+      if (cd.d) { cd.d.textContent = pad2(t.d); cd.h.textContent = pad2(t.h); cd.m.textContent = pad2(t.m); cd.s.textContent = pad2(t.s); }
+      if (tCount) tCount.textContent = `${pad2(t.d)}d ${pad2(t.h)}h ${pad2(t.m)}m ${pad2(t.s)}s`;
+    };
+    tick();
+    timer = setInterval(tick, 1000);
+
+    // Aviso flotante: aparece tras el hero; si se cierra, no vuelve en esta sesión
+    if (!box) return;
+    const KEY = 'nfr-deluxe-teaser-closed';
+    let closed = false;
+    try { closed = sessionStorage.getItem(KEY) === '1'; } catch (_) { }
+    if (closed) return;
+    let dismissed = false;
+    const hide = () => {
+      dismissed = true;
+      box.classList.remove('is-visible');
+      setTimeout(() => { box.hidden = true; }, 600);
+    };
+    setTimeout(() => {
+      if (dismissed) return;
+      box.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('is-visible')));
+    }, 2500);
+    box.querySelector('.diary-teaser__close').addEventListener('click', () => {
+      try { sessionStorage.setItem(KEY, '1'); } catch (_) { }
+      hide();
+    });
+    // Si ya está mirando la deluxe, el aviso sobra
+    document.addEventListener('nfr:edition', (e) => { if (e.detail === 'deluxe') hide(); });
+  })();
+
+  /* 17 · SELECTOR DE EDICIÓN (Álbum ↔ Deluxe) */
+  (function initEditionSwitch() {
+    const section = document.querySelector('.editions');
+    if (!section) return; // en /tour/ los enlaces /#album y /#deluxe llevan a la portada
+    const panels = [...section.querySelectorAll('[data-edition-panel]')];
+    const tabs = [...section.querySelectorAll('[role="tab"][data-edition-link]')];
+    const HASH = { standard: 'album', deluxe: 'deluxe' };
+    const fromHash = (h) => (h === '#deluxe' ? 'deluxe' : h === '#album' ? 'standard' : null);
+
+    const scrollToSection = (smooth) => {
+      const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'), 10) || 76;
+      const top = section.getBoundingClientRect().top + window.scrollY - headerH - 8;
+      window.scrollTo({ top, behavior: smooth && !prefersReduced ? 'smooth' : 'auto' });
+    };
+
+    const show = (name, { hash = false, animate = true } = {}) => {
+      const target = panels.find((p) => p.dataset.editionPanel === name);
+      if (!target) return;
+      const changed = section.dataset.edition !== name;
+      panels.forEach((p) => {
+        const on = p === target;
+        p.hidden = !on;
+        p.classList.toggle('is-active', on);
+      });
+      section.dataset.edition = name;
+      tabs.forEach((t) => {
+        const on = t.dataset.editionLink === name;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      // En el menú solo se marca cuando hay una edición elegida (no al cargar la portada)
+      if (hash || location.hash) {
+        document.querySelectorAll('.nav-link[data-edition-link]').forEach((l) =>
+          l.classList.toggle('nav-link--active', l.dataset.editionLink === name));
+      }
+      // Los .reveal de un panel recién mostrado deben verse sin esperar al scroll
+      target.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+      if (changed && animate && !prefersReduced) {
+        target.classList.remove('is-entering');
+        void target.offsetWidth;
+        target.classList.add('is-entering');
+      }
+      // Detiene el avance de audio al salir de la edición estándar
+      if (name !== 'standard') {
+        const btn = section.querySelector('.snippet.is-playing .snippet__btn');
+        if (btn) btn.click();
+      }
+      if (hash) history.replaceState(null, '', '#' + HASH[name]);
+      document.dispatchEvent(new CustomEvent('nfr:edition', { detail: name }));
+    };
+
+    // Clicks en cualquier enlace de edición (nav, hero, selector, aviso)
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('[data-edition-link]');
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      show(a.dataset.editionLink, { hash: true });
+      if (!a.closest('.edition-switch')) scrollToSection(true);
+    });
+
+    // Flechas izquierda/derecha dentro del selector
+    const switcher = section.querySelector('.edition-switch');
+    if (switcher) switcher.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus();
+      show(next.dataset.editionLink, { hash: true });
+    });
+
+    window.addEventListener('hashchange', () => {
+      const name = fromHash(location.hash);
+      if (name) { show(name); scrollToSection(true); }
+    });
+
+    const initial = fromHash(location.hash);
+    show(initial || 'standard', { animate: false });
+    section.classList.add('is-ready');
+    if (initial) {
+      // Tras cargar fuentes/imágenes para que la posición sea la buena
+      requestAnimationFrame(() => scrollToSection(false));
+      window.addEventListener('load', () => scrollToSection(false), { once: true });
+    }
+  })();
+
 })();
