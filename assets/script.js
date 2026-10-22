@@ -668,16 +668,16 @@
       eyebrow: 'Edición deluxe · Anunciada',
       desc: 'La edición deluxe de <em>no fue real</em> llega el <strong>20 de noviembre</strong>. La preventa abre el <strong>2 de noviembre a las 12:00</strong>.',
       label: 'La preventa abre en',
-      teaser: 'Preventa · 2 nov, 12:00',
+      teaser: 'Preventa · 3 nov, 12:00',
       actions: [
-        { label: 'Preventa · 2 NOV 12:00', primary: true, disabled: true },
+        { label: 'Preventa · 3 NOV 12:00', primary: true, disabled: true },
         { label: 'Añadir al calendario', ics: 'preorder' },
         { label: 'Seguir novedades', href: L.follow, external: true },
       ],
     },
     preorder: {
       eyebrow: 'Preventa abierta',
-      desc: 'La preventa de <em>(no) fue real</em> ya está abierta en la tienda oficial. La venta general empieza el <strong>3 de noviembre a las 12:00</strong>.',
+      desc: 'La preventa de <em>(no) fue real</em> ya está abierta en la tienda oficial. La venta general empieza el <strong>4 de noviembre a las 12:00</strong>.',
       label: 'La venta general empieza en',
       teaser: 'Preventa abierta',
       actions: [
