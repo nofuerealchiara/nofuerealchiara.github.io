@@ -666,7 +666,7 @@
   const DELUXE_PHASES = {
     countdown: {
       eyebrow: 'Edición deluxe · Anunciada',
-      desc: 'La edición deluxe de <em>no fue real</em> llega el <strong>20 de noviembre</strong>. La preventa abre el <strong>2 de noviembre a las 12:00</strong>.',
+      desc: 'La edición deluxe de <em>no fue real</em> llega el <strong>20 de noviembre</strong>. La preventa abre el <strong>3 de noviembre a las 12:00</strong>.',
       label: 'La preventa abre en',
       teaser: 'Preventa · 3 nov, 12:00',
       actions: [
